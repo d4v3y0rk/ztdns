@@ -41,9 +41,9 @@ module.exports.getRecords = function getRecords(zoneid) {
 
 module.exports.addRecord = function addRecord(memberName, ip) {
     return new Promise(async (resolve, reject) => {
-        var domainName = await getZoneName(process.env.hosted_zone)
+        var domainName = await getZoneName(process.env.aws_hosted_zone)
         var args = {
-            zoneId: process.env.hosted_zone,
+            zoneId: process.env.aws_hosted_zone,
             name: `${memberName}.zt.${domainName}`,
             type: 'A',
             ttl: 300,
@@ -64,9 +64,9 @@ module.exports.addRecord = function addRecord(memberName, ip) {
 
 module.exports.delRecord = function delRecord(memberName, ip) {
     return new Promise(async (resolve, reject) => {
-        var domainName = await getZoneName(process.env.hosted_zone)
+        var domainName = await getZoneName(process.env.aws_hosted_zone)
         var args = {
-            zoneId: process.env.hosted_zone,
+            zoneId: process.env.aws_hosted_zone,
             name: `${memberName}.zt.${domainName}`,
             type: 'A',
             ttl: 300,

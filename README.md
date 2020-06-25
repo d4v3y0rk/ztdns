@@ -7,11 +7,15 @@ Clone the repo and create a `.env` file with the following contents:
 
 ```
 zt_api_key=<your zerotier api key>
-aws_access_key_id=<your aws access key id>
-aws_secret_access_key=<your aws secret access key>
-hosted_zone=<your route53 hosted zone id>
 zt_network=<your zerotier network id>
 sleep_timeout=<a reasonable sleep timeout in milliseconds>
+# if using aws route53
+aws_access_key_id=<your aws access key id>
+aws_secret_access_key=<your aws secret access key>
+aws_hosted_zone=<your route53 hosted zone id>
+# if using vultr
+vultr_api_key=<your vultr api key>
+vultr_domain_name=<your vultr domain name>
 ```
 
 Then execute the code:

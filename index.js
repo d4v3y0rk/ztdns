@@ -1,6 +1,9 @@
 require('dotenv').config()
 
-const { getRecords, addRecord, delRecord } = require('./route53')
+// if using aws route53
+//const { getRecords, addRecord, delRecord } = require('./route53')
+// if using vultr
+const { getRecords, addRecord, delRecord } = require('./vultr')
 const { getZTMembers } = require('./zerotier')
 
 const sleep = (milliseconds) => {
@@ -13,7 +16,7 @@ async function main() {
         console.log('-----------------------')
         console.log()
         // get data from route53 about current zerotier records
-        var recordList = await getRecords(process.env.hosted_zone)
+        var recordList = await getRecords(process.env.aws_hosted_zone)
         
         // get data from zerotier about current network members
         var memberList = await getZTMembers()
@@ -44,7 +47,7 @@ async function main() {
         }
 
         // get records to delete
-        var recordListDiff = await getRecords(process.env.hosted_zone)
+        var recordListDiff = await getRecords(process.env.aws_hosted_zone)
         console.log('generating list of records to delete...')
         for (member of memberList) {
             if (recordListDiff.find(record => record.name == member.name)) {
