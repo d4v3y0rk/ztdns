@@ -43,3 +43,25 @@ module.exports.addRecord = function addRecord(memberName, ip) {
         })
     })
 }
+
+module.exports.delRecord = function delRecord(memberName, ip) {
+    return new Promise(async (resolve, reject) => {
+        var domainName = await getZoneName(process.env.hosted_zone)
+        var args = {
+            zoneId : process.env.hosted_zone,
+            name   : `${memberName}.zt.${domainName}`,
+            type   : 'A',
+            ttl    : 300,
+            values : [
+                ip,
+            ]
+        }
+        r53.delRecord(args, function(err, res) {
+            if (err) {
+                resolve(err)
+            } else {
+                resolve(res)
+            }
+        })
+    })
+}

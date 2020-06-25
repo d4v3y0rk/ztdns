@@ -1,6 +1,6 @@
 require('dotenv').config()
 
-const { getRecords, addRecord } = require('./route53')
+const { getRecords, addRecord, delRecord } = require('./route53')
 const { getZTMembers } = require('./zerotier')
 const { save } = require('./redis')
 
@@ -9,8 +9,10 @@ const sleep = (milliseconds) => {
 }
 
 async function main() {
-    while (0 == 0) {
+    while (true) {
         console.log(`the thing is running...`)
+        console.log('-----------------------')
+        console.log()
         // get data from route53 about current zerotier records
         var records = await getRecords(process.env.hosted_zone)
         var recordList = []
@@ -34,23 +36,55 @@ async function main() {
         }
 
         // generate actions
-
         // get records to add
-        var recordsToAdd = []
-        console.log('Records to add:')
+        console.log('generating list of records to add...')
+        var memberListDiff = memberList
         for (record of recordList) {
-            if (memberList.includes(record)) {
+            if (memberListDiff.find(member => member.name == record.name)) {
                 console.log(`Found ${record.name}`)
-            } else {
-                console.log(`did not find ${record.name}`)
+                let deleteMe = memberListDiff.findIndex(member => member.name == record.name)
+                memberListDiff.splice(deleteMe, 1)
             }
         }
+        if (memberListDiff.length > 0) {
+            console.log('Records to add:')
+            console.log(memberListDiff)
+            for (member of memberListDiff) {
+                var result = await addRecord(member.name, member.ip)
+                console.log(result)
+            }
+        } else {
+            console.log()
+            console.log('No records to add.')
+            console.log()
+        }
 
+        // get records to delete
+        var recordListDiff = recordList
+        console.log('generating list of records to delete...')
+        for (member of memberListDiff) {
+            if (recordListDiff.find(record => record.name == member.name)) {
+                
+            } else {
+                console.log(`Need to delete ${member.name}`)
+                let deleteMe = recordListDiff.findIndex(record => record.name == member.name)
+                recordListDiff.splice(deleteMe, 1)
+            }
+        }
+        if (recordListDiff.length > 0) {
+            console.log('Records to delete:')
+            console.log(recordListDiff)
+            for (record of recordListDiff) {
+                console.log(`deleting ${record}`)
+                // var result = await delRecord(member.name, member.ip)
+                // console.log(result)
+            }
+        } else {
+            console.log('No records to delete.')
+        }
+
+        // sleep
         await sleep(process.env.sleep_timeout)
-        recordsToAdd = []
-        memberList = []
-        // var result = await addRecord(add.name, add.ip)
-        // console.log(result)
         console.log()
         console.log()
     }
