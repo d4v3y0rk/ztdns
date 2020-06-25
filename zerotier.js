@@ -8,6 +8,13 @@ module.exports.getZTMembers = function getZTMembers() {
             headers: { 'Authorization': "bearer " + process.env.zt_api_key }
         }
         var ztData = await request(ztOptions)
-        resolve(ztData.data)
+        var memberList = []
+        for (member of ztData.data) {
+            var addme = {}
+            addme.name = member.name
+            addme.ip = member.config.ipAssignments[0]
+            memberList.push(addme)
+        }
+        resolve(memberList)
     })
 }
