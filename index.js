@@ -1,42 +1,59 @@
-const { default: Axios } = require('axios')
-
 require('dotenv').config()
-const request = require('axios')
-const redis = require("redis")
-var AWS = require('aws-sdk')
+
+const { getRecords, addRecord } = require('./route53')
+const { getZTMembers } = require('./zerotier')
+const { save } = require('./redis')
+
+const sleep = (milliseconds) => {
+    return new Promise(resolve => setTimeout(resolve, milliseconds))
+}
 
 async function main() {
-    const client = redis.createClient()
-
-    client.on("error", function (error) {
-        console.error(error)
-    })
-
-    AWS.config.accessKeyId = process.env.aws_access_key_id
-    AWS.config.secretAccessKey = process.env.aws_secret_access_key
-
-    var route53 = new AWS.Route53()
-    var params = {
-        Id: process.env.hosted_zone
-    }
-    route53.getHostedZone(params, function (err, data) {
-        if (err) {
-            console.log(err, err.stack)
+    while (0 == 0) {
+        console.log(`the thing is running...`)
+        // get data from route53 about current zerotier records
+        var records = await getRecords(process.env.hosted_zone)
+        var recordList = []
+        for (record of records) {
+            var addme = {}
+            if (record.name.match(/zt/)) {
+                addme.name = record.name.split('.')[0]
+                addme.ip = record.values[0]
+                recordList.push(addme)
+            }
         }
-        else {
-            console.log(`Got good response from Route53`)
-        }
-    })
 
-    var ztOptions = {
-        baseURL: 'https://my.zerotier.com',
-        url: `/api/network/${process.env.zt_network}/member`,
-        headers: { 'Authorization': "bearer " + process.env.zt_api_key }
-    }
-    var ztData = await request(ztOptions)
-    for (member of ztData.data) {
-        console.log(member.name)
-        console.log(member.config.ipAssignments)
+        // get data from zerotier about current network members
+        var ztData = await getZTMembers()
+        var memberList = []
+        for (member of ztData) {
+            var addme = {}
+            addme.name = member.name
+            addme.ip = member.config.ipAssignments[0]
+            memberList.push(addme)
+        }
+
+        // generate actions
+
+        // get records to add
+        var recordsToAdd = []
+        console.log('Records to add:')
+        for (record of recordList) {
+            if (memberList.includes(record)) {
+                console.log(`Found ${record.name}`)
+            } else {
+                console.log(`did not find ${record.name}`)
+            }
+        }
+
+        await sleep(process.env.sleep_timeout)
+        recordsToAdd = []
+        memberList = []
+        // var result = await addRecord(add.name, add.ip)
+        // console.log(result)
+        console.log()
+        console.log()
     }
 }
+
 main()
