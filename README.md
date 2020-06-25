@@ -25,3 +25,7 @@ ssh <membername>.zt.example.com
 You can leave it running and it will keep the DNS records updated when there are changes. 
 
 The only other requirement is that members of your zerotier network have a *short name*. If they do not have a *short name* the request to Route53 will fail. 
+
+## Contributing
+
+Open a PR and lets talk. :)
