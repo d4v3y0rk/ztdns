@@ -57,7 +57,7 @@ async function checkDeletes(memberList) {
     }
 }
 
-async function checkChanges(memberList) {
+async function checkChanges(memberList, recordList) {
     //get records to change
     var recordListDiff = await getRecords(process.env.hosted_zone)
     console.log('generating list of records to change...')
@@ -76,7 +76,7 @@ async function checkChanges(memberList) {
             var result = await delRecord(record.name, record.ip)
             console.log(result)
         }
-        await checkAdds()
+        await checkAdds(recordList)
     } else {
         console.log()
         console.log('No records to change.')
@@ -98,7 +98,7 @@ async function main() {
         // generate actions
         await checkAdds(recordList)
         await checkDeletes(memberList)
-        await checkChanges(memberList)
+        await checkChanges(memberList, recordList)
 
         // sleep
         await sleep(process.env.sleep_timeout)
