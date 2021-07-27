@@ -13,7 +13,7 @@ module.exports.getZTMembers = function getZTMembers() {
         for (member of ztData.data) {
             var addme = {}
             if (member.name != "") {
-                addme.name = member.name
+                addme.name = member.name.toLowerCase()
             } else {
                 addme.name = member.nodeId
             }

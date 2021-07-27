@@ -90,8 +90,10 @@ async function main() {
         console.log('-----------------------')
         console.log()
         // get data from route53 about current zerotier records
+        console.log('Getting existing records from the DNS provider...')
         var recordList = await getRecords(process.env.hosted_zone)
         
+        console.log('Getting the list of member systems from Zerotier...')
         // get data from zerotier about current network members
         var memberList = await getZTMembers()
         
